@@ -25,3 +25,7 @@ The shadow is set as follows:
     BoxShadowWrapper(btn, outside, disable_margins=True)
     btn.pressed.connect(lambda: btn.parent().setShadowList(inside) or btn.update())
     btn.released.connect(lambda: btn.parent().setShadowList(outside) or btn.update())
+  
+  # Example file preview
+  ![neumorphism light normal](https://g-leo.fun/media/portfolio_4/neumorphism_light_normal.png)
+  ![neumorphism dark pressed](https://g-leo.fun/media/portfolio_4/neumorphism_dark_pressed.png)
