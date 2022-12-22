@@ -1,3 +1,6 @@
+from PySide6 import QtCore, QtWidgets, QtGui
+from Neumorphism import *
+
 class Calculator(QtWidgets.QWidget):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
