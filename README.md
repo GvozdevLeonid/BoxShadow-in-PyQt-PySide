@@ -29,11 +29,11 @@ The shadow is set as follows:
  # Smooth rendering
  You can choose the type of rendering: anti-aliasing or not. With smooth rendering, borders are rendered clearly without distortion, but more resources are required. For smooth rendering, specify it: smooth=True.
  
- #Smooth example
+ # Smooth example
  ![Uploading Снимок экрана 2022-12-25 в 12.34.28.png…]()
     
   
-  # Example file preview
+  # Example file preview (without smooth)
   ![neumorphism light normal](https://g-leo.fun/media/portfolio_4/neumorphism_light_normal.png)
 
   ![neumorphism dark pressed](https://g-leo.fun/media/portfolio_4/neumorphism_dark_pressed.png)
