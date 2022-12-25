@@ -1,8 +1,8 @@
 # Neumorphism effects in PyQt/PySide
 This repository contains two classes: BoxShadow is a graphical effect in which you need to set a list of shadows and a border width. BoxShadowWrapper - a handy wrapper for displaying the shadow effect.
 
-    BoxShadow(shadow_effects: tiple[dict], border: int = 0).
-    BoxShadowWrapper(widget: QtWidgets.QObject, shadow_effects: tiple[dict], border: int = 0, disable_margins: bool = False, margins: tuple[float, float, float, float] | tuple[float, float] = None)
+    BoxShadow(shadow_effects: tiple[dict], border: int = 0, smooth: bool = False).
+    BoxShadowWrapper(widget: QtWidgets.QObject, shadow_effects: tiple[dict], border: int = 0, disable_margins: bool = False, margins: tuple[float, float, float, float] | tuple[float, float] = None, smooth: bool = False)
 
 The shadow is set as follows:
  
@@ -25,7 +25,14 @@ The shadow is set as follows:
     BoxShadowWrapper(btn, outside, disable_margins=True)
     btn.pressed.connect(lambda: btn.parent().setShadowList(inside) or btn.update())
     btn.released.connect(lambda: btn.parent().setShadowList(outside) or btn.update())
+ 
+ # Smooth rendering
+ You can choose the type of rendering: anti-aliasing or not. With smooth rendering, borders are rendered clearly without distortion, but more resources are required. For smooth rendering, specify it: smooth=True.
+ 
+ #Smooth example
+    
   
   # Example file preview
-  ![neumorphism light normal](https://g-leo.fun/media/portfolio_4/neumorphism_light_normal.png)
+  ![neumorphism light normal](https://g-leo.fun/media/portfolio_4/neumorphism_light_normal.png)![Uploading Снимок экрана 2022-12-25 в 12.34.28.png…]()
+
   ![neumorphism dark pressed](https://g-leo.fun/media/portfolio_4/neumorphism_dark_pressed.png)
