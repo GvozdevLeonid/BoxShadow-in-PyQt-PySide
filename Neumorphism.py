@@ -1,5 +1,5 @@
 class BoxShadow(QtWidgets.QGraphicsEffect):
-    def __init__(self, shadow_list: list[dict] = None, border: int = 0):
+    def __init__(self, shadow_list: list[dict] = None, border: int = 0, smooth: bool = False):
         QtWidgets.QGraphicsEffect.__init__(self)
 
         self._shadow_list = []
@@ -7,6 +7,7 @@ class BoxShadow(QtWidgets.QGraphicsEffect):
         self._max_x_offset = 0
         self._max_y_offset = 0
         self._border = 0
+        self._smooth = smooth
         self.setShadowList(shadow_list)
         self.setBorder(border)
 
@@ -129,6 +130,7 @@ class BoxShadow(QtWidgets.QGraphicsEffect):
                 shadow_painter.drawPixmap(_shadow["offset"][0], _shadow["offset"][1], mask)
 
                 shadow_mask = shadow.createMaskFromColor(color, QtCore.Qt.MaskMode.MaskOutColor)
+                shadow_mask.save("mask.png")
                 shadow.fill(QtCore.Qt.transparent)
                 shadow_painter.setPen(color)
                 shadow_painter.drawPixmap(0, 0, shadow_mask)
@@ -155,6 +157,111 @@ class BoxShadow(QtWidgets.QGraphicsEffect):
 
         return inside_shadow
 
+    def _colored_pixmap(self, color: QtGui.QColor, pixmap:QtGui.QPixmap):
+        new_pixmap = QtGui.QPixmap(pixmap)
+        new_pixmap.fill(color)
+        painter = QtGui.QPainter(new_pixmap)
+        painter.setTransform(QtGui.QTransform())
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        painter.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_DestinationIn)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+        return new_pixmap
+
+    def _smooth_outside_shadow(self):
+
+        offset = QtCore.QPoint()
+        source = self.sourcePixmap(QtCore.Qt.CoordinateSystem.DeviceCoordinates, offset)
+        w, h = source.width(), source.height()
+
+        _pixmap_shadow_list = []
+
+        for _shadow in self._shadow_list:
+            if "outside" in _shadow.keys():
+                shadow = QtGui.QPixmap(source.size())
+                shadow.fill(QtCore.Qt.transparent)
+                shadow_painter = QtGui.QPainter(shadow)
+                shadow_painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+                shadow_painter.setTransform(QtGui.QTransform())
+                shadow_painter.drawPixmap(_shadow["offset"][0], _shadow["offset"][1], w, h, self._colored_pixmap(_shadow["color"], source))
+                shadow_painter.end()
+
+                _pixmap_shadow_list.append(shadow)
+
+        outside_shadow = QtGui.QPixmap(source.size())
+        outside_shadow.fill(QtCore.Qt.transparent)
+
+        outside_shadow_painter = QtGui.QPainter(outside_shadow)
+        outside_shadow_painter.setTransform(QtGui.QTransform())
+        outside_shadow_painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+
+        for i, pixmap in enumerate(_pixmap_shadow_list):
+            outside_shadow_painter.drawPixmap(0, 0, w, h, self._blur_pixmap(pixmap, self._shadow_list[i]["blur"]))
+
+        outside_shadow_painter.end()
+
+        outside_shadow_painter = QtGui.QPainter(outside_shadow)
+        outside_shadow_painter.setTransform(QtGui.QTransform())
+        outside_shadow_painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        outside_shadow_painter.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_DestinationOut)
+        outside_shadow_painter.drawPixmap(0, 0, w, h, source)
+
+        outside_shadow_painter.end()
+
+        return outside_shadow
+
+    def _smooth_inside_shadow(self):
+
+        offset = QtCore.QPoint()
+        source = self.sourcePixmap(QtCore.Qt.CoordinateSystem.DeviceCoordinates, offset)
+        w, h = source.width(), source.height()
+
+        _pixmap_shadow_list = []
+
+        def cut_shadow(pixmap: QtGui.QPixmap, source: QtGui.QPixmap, offset_x, offset_y):
+            painter = QtGui.QPainter(pixmap)
+            painter.setTransform(QtGui.QTransform())
+            painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+            painter.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_DestinationOut)
+            painter.drawPixmap(offset_x, offset_y, source)
+            painter.end()
+            return pixmap
+
+        for _shadow in self._shadow_list:
+            if "inside" in _shadow.keys():
+                shadow = QtGui.QPixmap(source.size())
+                shadow.fill(QtCore.Qt.transparent)
+                shadow_painter = QtGui.QPainter(shadow)
+                shadow_painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+                shadow_painter.setTransform(QtGui.QTransform())
+                new_source = self._colored_pixmap(_shadow["color"], source)
+                shadow_painter.drawPixmap(0, 0, w, h, cut_shadow(new_source, source, _shadow["offset"][0] / 2, _shadow["offset"][1] / 2))
+                shadow_painter.end()
+
+                _pixmap_shadow_list.append(shadow)
+
+        inside_shadow = QtGui.QPixmap(source.size())
+        inside_shadow.fill(QtCore.Qt.transparent)
+
+        inside_shadow_painter = QtGui.QPainter(inside_shadow)
+        inside_shadow_painter.setTransform(QtGui.QTransform())
+        inside_shadow_painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+
+        for i, pixmap in enumerate(_pixmap_shadow_list):
+            inside_shadow_painter.drawPixmap(0, 0, w, h, self._blur_pixmap(pixmap, self._shadow_list[i]["blur"]))
+
+        inside_shadow_painter.end()
+
+        inside_shadow_painter = QtGui.QPainter(inside_shadow)
+        inside_shadow_painter.setTransform(QtGui.QTransform())
+        inside_shadow_painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        inside_shadow_painter.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_DestinationIn)
+        inside_shadow_painter.drawPixmap(0, 0, w, h, source)
+
+        inside_shadow_painter.end()
+
+        return inside_shadow
+
     def draw(self, painter):
 
         painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform)
@@ -168,22 +275,25 @@ class BoxShadow(QtWidgets.QGraphicsEffect):
 
         painter.setTransform(QtGui.QTransform())
 
-        outside_shadow = self._outside_shadow()
-        inside_shadow = self._inside_shadow()
+        if self._smooth:
+            outside_shadow = self._smooth_outside_shadow()
+            inside_shadow = self._smooth_inside_shadow()
+        else:
+            outside_shadow = self._outside_shadow()
+            inside_shadow = self._inside_shadow()
 
         painter.setPen(QtCore.Qt.NoPen)
 
         painter.drawPixmap(x, y, w, h, outside_shadow)
-        painter.drawPixmap(x, y, w, h, source)
+        painter.drawPixmap(x, y, source)
         painter.drawPixmap(x + self._border, y + self._border, w - self._border * 2, h - self._border * 2, inside_shadow)
-
         painter.setWorldTransform(restoreTransform)
 
         painter.end()
 
 
 class BoxShadowWrapper(QtWidgets.QWidget):
-    def __init__(self, widget, shadow_list: list[dict] = None, border: int = 0, disable_margins: bool = False, margins: tuple[float, float, float, float] | tuple[float, float] = None):
+    def __init__(self, widget, shadow_list: list[dict] = None, border: int = 0, disable_margins: bool = False, margins: tuple[float, float, float, float] | tuple[float, float] = None, smooth: bool = False):
         QtWidgets.QWidget.__init__(self)
 
         self._widget = widget
@@ -192,7 +302,7 @@ class BoxShadowWrapper(QtWidgets.QWidget):
 
         self.mLayout.addWidget(self._widget)
 
-        self.boxShadow = BoxShadow(shadow_list, border)
+        self.boxShadow = BoxShadow(shadow_list, border, smooth)
         self._widget.setGraphicsEffect(self.boxShadow)
 
         self.disable_margins = True if (disable_margins is True or margins is not None) else False
