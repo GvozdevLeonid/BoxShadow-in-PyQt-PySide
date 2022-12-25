@@ -1,4 +1,4 @@
-# Neumorphism effects in PyQt/PySide
+# Box shadow effects in PyQt/PySide
 This repository contains two classes: BoxShadow is a graphical effect in which you need to set a list of shadows and a border width. BoxShadowWrapper - a handy wrapper for displaying the shadow effect.
 
     BoxShadow(shadow_effects: tiple[dict], border: int = 0, smooth: bool = False).
