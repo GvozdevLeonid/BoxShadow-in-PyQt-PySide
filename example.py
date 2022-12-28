@@ -110,5 +110,5 @@ class Calculator(QtWidgets.QWidget):
 
 app = QtWidgets.QApplication([])
 app.setStyle("Fusion")
-c = Calculator()
+w = Calculator()
 app.exec()
