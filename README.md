@@ -33,6 +33,5 @@ The shadow is set as follows:
  <img width="1041" alt="smooth example" src="https://user-images.githubusercontent.com/87101242/209466761-095e04be-e8b5-4362-b593-724e5e7a62fe.png">
 
  # Example file preview (with smooth)
- ![neumorphism light normal](https://g-leo.fun/media/portfolio_4/neumorphism_light_normal.png)
-
- ![neumorphism dark pressed](https://g-leo.fun/media/portfolio_4/neumorphism_dark_pressed.png)
+ <img width="303" alt="light outside" src="https://user-images.githubusercontent.com/87101242/209801809-53667138-1f34-488b-bc7b-0d1ca20ba0c7.png">
+ <img width="304" alt="dark inside" src="https://user-images.githubusercontent.com/87101242/209801821-e1e06aa2-6485-46a0-b7a0-a4a42f72a663.png">
