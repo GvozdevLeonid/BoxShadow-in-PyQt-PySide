@@ -1,4 +1,5 @@
 # Box shadow effects in PyQt/PySide
+Tested on PySide6 and PyQt6
 This repository contains two classes: BoxShadow is a graphical effect in which you need to set a list of shadows and a border width. BoxShadowWrapper - a handy wrapper for displaying the shadow effect.
 
     BoxShadow(shadow_effects: tiple[dict], border: int = 0, smooth: bool = False).
