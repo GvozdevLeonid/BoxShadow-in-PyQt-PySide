@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtWidgets, QtGui
-from Neumorphism import *
+from Neumorphism.python_3_11.darwin.arm64.Naumorphism import *
 
 class Calculator(QtWidgets.QWidget):
     def __init__(self):
